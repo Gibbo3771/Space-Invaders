@@ -16,14 +16,14 @@
 
 package net.teaminvaders.spaceinvaders.screens;
 
-import net.teaminvaders.spaceinvaders.engine.Options;
-import net.teaminvaders.spaceinvaders.engine.SoundEngine;
-import net.teaminvaders.spaceinvaders.engine.SoundSequencer;
+import net.teaminvaders.spaceinvaders.engine.Settings;
+import net.teaminvaders.spaceinvaders.engine.SoundFactory;
 import net.teaminvaders.spaceinvaders.engine.ui.UIHandler;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.ButtonCallback;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.TextButton;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.list.WidgetList;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -42,13 +42,13 @@ import com.gibbo.gameutil.camera.ActionOrthoCamera;
  * @author Stephen Gibson
  */
 public class MenuScreen implements Screen, InputProcessor {
-	
+
 	public static MenuScreen instance = new MenuScreen();
 
 	ActionOrthoCamera cam = new ActionOrthoCamera();
 
 	UIHandler uiHandler = new UIHandler();
-	
+
 	WidgetList list = new WidgetList(450, 350, 300, 100);
 
 	SpriteBatch batch = new SpriteBatch();
@@ -56,72 +56,52 @@ public class MenuScreen implements Screen, InputProcessor {
 	Sprite menuSprite = new Sprite(new Texture(
 			Gdx.files.internal("data/graphics/menulow.png")));
 
+	Sprite bg = new Sprite(new Texture(
+			Gdx.files.internal("data/graphics/gamescreenbg.png")));
+
 	Sprite alien = new Sprite(new Texture(
 			Gdx.files.internal("data/graphics/10alien.png")));
 
 	TextButton play = new TextButton("PLAY", 300, 100, new ButtonCallback() {
-				
-				@Override
-				public void execute() {
-					soundEngine.getMusic("theme").setVolume(0.20f);
-					((Game)Gdx.app.getApplicationListener()).setScreen(new GameScreen());
-				}
-			});
-	
-	TextButton options = new TextButton("OPTIONS", 300, 100, new ButtonCallback() {
-		
+
 		@Override
 		public void execute() {
-			
-			((Game)Gdx.app.getApplicationListener()).setScreen(OptionsScreen.instance);
+			SoundFactory.getInstance().getMusic("theme").setVolume(0.20f);
+			((Game) Gdx.app.getApplicationListener())
+					.setScreen(new GameScreen());
 		}
 	});
-	
-	TextButton exit = new TextButton("QUIT", 300, 100, new ButtonCallback() {
-				
+
+	TextButton options = new TextButton("OPTIONS", 300, 100,
+			new ButtonCallback() {
+
 				@Override
 				public void execute() {
-					Gdx.app.exit();
+
+					((Game) Gdx.app.getApplicationListener())
+							.setScreen(OptionsScreen.instance);
 				}
 			});
+
+	TextButton exit = new TextButton("QUIT", 300, 100, new ButtonCallback() {
+
+		@Override
+		public void execute() {
+			Gdx.app.exit();
+		}
+	});
 
 	BitmapFont font = new BitmapFont(
 			Gdx.files.internal("data/font/SpaceInvaders28.fnt"));
 
 	ShapeRenderer sr = new ShapeRenderer();
-	
-	
-	/** The sound engine */
-	SoundEngine soundEngine = SoundEngine.getInstance();
-	
 
 	public MenuScreen() {
-		
-		Options.load();
-		
-		soundEngine.addMusic("theme", "data/music/spaceinvaders1.mp3");
-		
-		soundEngine.addSound("playershoot", "data/sounds/pew.ogg");
-		soundEngine.addSound("playerkilled", "data/sounds/playerkilled.ogg");		
-		soundEngine.addSound("invaderkilled", "data/sounds/invaderkilled.ogg");
-		soundEngine.addSound("special", "data/sounds/ufo_lowpitch.wav");		
-		
-		SoundSequencer invadermove = new SoundSequencer();
-		SoundSequencer invaderfast = new SoundSequencer();
-		
-		for(int x = 1; x <= 3; x++){
-			invadermove.addSound("data/sounds/move"+x+".wav");
-			invaderfast.addSound("data/sounds/fast"+x+".wav");
-			
-		}
-		
-		soundEngine.addSoundSequence("invaderfast", invaderfast);
-		soundEngine.addSoundSequence("invadermove", invadermove);
-		
-		
+
 		cam.setToOrtho(false, 1920, 1080);
-		
+
 		menuSprite.setSize(1920, 1080);
+		bg.setSize(1920, 1080);
 
 		uiHandler.addCamera(cam);
 
@@ -129,9 +109,9 @@ public class MenuScreen implements Screen, InputProcessor {
 		list.addWidget(options);
 		list.addWidget(exit);
 		uiHandler.addWidget(list);
-		
-		soundEngine.playMusic("theme", 0.75f, true);
-		
+
+		SoundFactory.getInstance().playMusic("theme", 0.75f, true);
+
 	}
 
 	@Override
@@ -143,18 +123,21 @@ public class MenuScreen implements Screen, InputProcessor {
 		batch.begin();
 
 		menuSprite.setPosition(0, 0);
+		bg.draw(batch);
 		menuSprite.draw(batch);
 
 		uiHandler.draw(batch);
 		uiHandler.update();
 
-		batch.draw(alien.getTexture(), list.getSelected().getBounds().x
-				- (alien.getTexture().getWidth() / 2), list.getSelected().getBounds().y
-				+ (list.getSelected().getBounds().height / 2)
-				- (alien.getTexture().getHeight() / 2), alien.getTexture()
-				.getWidth() / 2, alien.getTexture().getHeight(), 0, 0, alien
-				.getTexture().getWidth() / 2, alien.getTexture().getHeight(),
-				false, false);
+		if (Settings.applicationType == ApplicationType.Desktop)
+			batch.draw(alien.getTexture(), list.getSelected().getBounds().x
+					- (alien.getTexture().getWidth() / 2), list.getSelected()
+					.getBounds().y
+					+ (list.getSelected().getBounds().height / 2)
+					- (alien.getTexture().getHeight() / 2), alien.getTexture()
+					.getWidth() / 2, alien.getTexture().getHeight(), 0, 0,
+					alien.getTexture().getWidth() / 2, alien.getTexture()
+							.getHeight(), false, false);
 
 		batch.end();
 
@@ -167,7 +150,7 @@ public class MenuScreen implements Screen, InputProcessor {
 	@Override
 	public void show() {
 		Gdx.input.setInputProcessor(uiHandler);
-		soundEngine.getMusic("theme").setVolume(1);
+		SoundFactory.getInstance().getMusic("theme").setVolume(1);
 
 	}
 

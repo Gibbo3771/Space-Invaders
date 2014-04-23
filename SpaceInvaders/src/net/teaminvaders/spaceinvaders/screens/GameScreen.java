@@ -17,7 +17,7 @@
 package net.teaminvaders.spaceinvaders.screens;
 
 import net.teaminvaders.spaceinvaders.engine.Explosion;
-import net.teaminvaders.spaceinvaders.engine.SoundEngine;
+import net.teaminvaders.spaceinvaders.engine.SoundFactory;
 import net.teaminvaders.spaceinvaders.entity.Alien;
 import net.teaminvaders.spaceinvaders.entity.Bunker;
 import net.teaminvaders.spaceinvaders.entity.Player;
@@ -129,6 +129,7 @@ public class GameScreen implements Screen, InputProcessor {
 	@Override
 	public void render(float delta) {
 		cam.update();
+		cam.center(delta);
 
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
@@ -175,7 +176,7 @@ public class GameScreen implements Screen, InputProcessor {
 										.getScore())).width / 2), UI_HEIGHT
 								- (font.getBounds("X").height * 3));
 				level.special = null;
-				SoundEngine.getInstance().stopSound("special");
+				SoundFactory.getInstance().stopSound("special");
 				if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
 					gameOver = false;
 					((Game) Gdx.app.getApplicationListener())

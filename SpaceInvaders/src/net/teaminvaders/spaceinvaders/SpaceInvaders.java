@@ -16,7 +16,8 @@
 
 package net.teaminvaders.spaceinvaders;
 
-import net.teaminvaders.spaceinvaders.screens.MenuScreen;
+
+import net.teaminvaders.spaceinvaders.screens.SplashScreen;
 
 import com.badlogic.gdx.Game;
 
@@ -24,7 +25,7 @@ public class SpaceInvaders extends Game {
 	
 	@Override
 	public void create() {	
-		setScreen(MenuScreen.instance);
+		setScreen(new SplashScreen());
 	}
 
 	@Override

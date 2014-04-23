@@ -18,7 +18,7 @@ package net.teaminvaders.spaceinvaders.level;
 
 import net.teaminvaders.spaceinvaders.engine.CollisionHandler;
 import net.teaminvaders.spaceinvaders.engine.Explosion;
-import net.teaminvaders.spaceinvaders.engine.SoundEngine;
+import net.teaminvaders.spaceinvaders.engine.SoundFactory;
 import net.teaminvaders.spaceinvaders.entity.Alien;
 import net.teaminvaders.spaceinvaders.entity.Alien.AlienType;
 import net.teaminvaders.spaceinvaders.entity.Bunker;
@@ -152,7 +152,7 @@ public class Level {
 							GameScreen.player.setProjectile(null);
 							special.die();
 							special = null;
-							SoundEngine.getInstance().stopSound("special");
+							SoundFactory.getInstance().stopSound("special");
 							lastSpecial = TimeUtils.nanoTime();
 							continue;
 						}
@@ -287,9 +287,9 @@ public class Level {
 
 			lastMove = TimeUtils.nanoTime();
 			if (alienCount > 1) {
-				SoundEngine.getInstance().playSoundSequence("invadermove", 1);
+				SoundFactory.getInstance().playSoundSequence("invadermove", 1);
 			} else {
-				SoundEngine.getInstance().playSoundSequence("invaderfast", 1f,
+				SoundFactory.getInstance().playSoundSequence("invaderfast", 1f,
 						0.10f);
 
 			}
@@ -310,7 +310,7 @@ public class Level {
 				}
 
 				special.getBounds().x = spawnSpot;
-				SoundEngine.getInstance().loopSound("special", 0.25f);
+				SoundFactory.getInstance().loopSound("special", 0.25f);
 			}
 		}
 
@@ -386,7 +386,7 @@ public class Level {
 				special.fire();
 			if (special.getBounds().x < 6 || special.getBounds().x > 40) {
 				special = null;
-				SoundEngine.getInstance().stopSound("special");
+				SoundFactory.getInstance().stopSound("special");
 				lastSpecial = TimeUtils.nanoTime();
 			}
 		}

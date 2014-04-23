@@ -16,14 +16,15 @@
 
 package net.teaminvaders.spaceinvaders.screens;
 
-import net.teaminvaders.spaceinvaders.engine.Options;
-import net.teaminvaders.spaceinvaders.engine.SoundEngine;
+import net.teaminvaders.spaceinvaders.engine.Settings;
+import net.teaminvaders.spaceinvaders.engine.SoundFactory;
 import net.teaminvaders.spaceinvaders.engine.ui.UIHandler;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.ButtonCallback;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.TextButton;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.ToggleButton;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.list.WidgetList;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -47,31 +48,27 @@ public class OptionsScreen implements Screen {
 
 	WidgetList list = new WidgetList(450, 350, 300, 100);
 
-	ToggleButton sound = new ToggleButton("SOUND : ON", "SOUND : OFF",
-			0, 0,
+	ToggleButton sound = new ToggleButton("SOUND : ON", "SOUND : OFF", 0, 0,
 			300, 100, new ButtonCallback() {
 
 				@Override
 				public void execute() {
-					Options.soundEnabled = Options.soundEnabled == 1 ? -1 : 1;
+					Settings.soundEnabled = Settings.soundEnabled == 1 ? -1 : 1;
 				}
 			});
 
-	ToggleButton music = new ToggleButton("MUSIC : ON", "MUSIC : OFF",
-			0, 0,
+	ToggleButton music = new ToggleButton("MUSIC : ON", "MUSIC : OFF", 0, 0,
 			300, 100, new ButtonCallback() {
 
 				@Override
 				public void execute() {
-					Options.musicEnabled = Options.musicEnabled == 1 ? -1 : 1;
-					if (Options.musicEnabled == -1) {
-							SoundEngine.getInstance().getMusic("theme").pause();
+					Settings.musicEnabled = Settings.musicEnabled == 1 ? -1 : 1;
+					if (Settings.musicEnabled == -1) {
+						SoundFactory.getInstance().getMusic("theme").pause();
 					} else {
-							SoundEngine.getInstance().playMusic("theme", 0.75f,
-									true);
+						SoundFactory.getInstance().playMusic("theme", 0.75f,
+								true);
 					}
-					
-
 
 				}
 			});
@@ -90,6 +87,9 @@ public class OptionsScreen implements Screen {
 	Sprite menuSprite = new Sprite(new Texture(
 			Gdx.files.internal("data/graphics/menulow.png")));
 
+	Sprite bg = new Sprite(new Texture(
+			Gdx.files.internal("data/graphics/gamescreenbg.png")));
+
 	Sprite alien = new Sprite(new Texture(
 			Gdx.files.internal("data/graphics/10alien.png")));
 
@@ -98,6 +98,7 @@ public class OptionsScreen implements Screen {
 		cam.setToOrtho(false, 1920, 1080);
 
 		menuSprite.setSize(1920, 1080);
+		bg.setSize(1920, 1080);
 
 		uiHandler.addCamera(cam);
 
@@ -105,16 +106,16 @@ public class OptionsScreen implements Screen {
 		list.addWidget(music);
 		list.addWidget(back);
 		uiHandler.addWidget(list);
-		
-		if(Options.musicEnabled == -1){
+
+		if (Settings.musicEnabled == -1) {
 			music.enabled = false;
-		}else{
+		} else {
 			music.enabled = true;
 		}
-		
-		if(Options.soundEnabled == - 1){
+
+		if (Settings.soundEnabled == -1) {
 			sound.enabled = false;
-		}else{
+		} else {
 			sound.enabled = true;
 		}
 
@@ -129,19 +130,22 @@ public class OptionsScreen implements Screen {
 		batch.begin();
 
 		menuSprite.setPosition(0, 0);
+		bg.draw(batch);
 		menuSprite.draw(batch);
 
 		uiHandler.draw(batch);
 		uiHandler.update();
 
-		batch.draw(alien.getTexture(), list.getSelected().getBounds().x
-				- (alien.getTexture().getWidth()), list.getSelected()
-				.getBounds().y
-				+ (list.getSelected().getBounds().height / 2)
-				- (alien.getTexture().getHeight() / 2), alien.getTexture()
-				.getWidth() / 2, alien.getTexture().getHeight(), 0, 0, alien
-				.getTexture().getWidth() / 2, alien.getTexture().getHeight(),
-				false, false);
+		if (Settings.applicationType == ApplicationType.Desktop) {
+			batch.draw(alien.getTexture(), list.getSelected().getBounds().x
+					- (alien.getTexture().getWidth()), list.getSelected()
+					.getBounds().y
+					+ (list.getSelected().getBounds().height / 2)
+					- (alien.getTexture().getHeight() / 2), alien.getTexture()
+					.getWidth() / 2, alien.getTexture().getHeight(), 0, 0,
+					alien.getTexture().getWidth() / 2, alien.getTexture()
+							.getHeight(), false, false);
+		}
 
 		batch.end();
 
@@ -154,12 +158,12 @@ public class OptionsScreen implements Screen {
 	@Override
 	public void show() {
 		Gdx.input.setInputProcessor(uiHandler);
-		list.setSelected(0);
+		list.setSelectedIndex(0);
 	}
 
 	@Override
 	public void hide() {
-		Options.save();
+		Settings.save();
 	}
 
 	@Override

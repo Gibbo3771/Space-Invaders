@@ -17,7 +17,7 @@
 package net.teaminvaders.spaceinvaders.entity;
 
 import net.teaminvaders.spaceinvaders.engine.Explosion;
-import net.teaminvaders.spaceinvaders.engine.SoundEngine;
+import net.teaminvaders.spaceinvaders.engine.SoundFactory;
 import net.teaminvaders.spaceinvaders.level.Level;
 import net.teaminvaders.spaceinvaders.screens.GameScreen;
 
@@ -181,7 +181,7 @@ public class Alien extends Entity implements Comparable<Alien> {
 	public void die() {
 		GameScreen.explosions
 				.add(new Explosion(bounds.x, bounds.y, 1.5f, 1.5f));
-		SoundEngine.getInstance().playSound("invaderkilled", 0.70f);
+		SoundFactory.getInstance().playSound("invaderkilled", 0.70f);
 	}
 
 	/** Move the alien left by 1 unit */

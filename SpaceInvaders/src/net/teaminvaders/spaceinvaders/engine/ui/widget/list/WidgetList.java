@@ -148,9 +148,14 @@ public class WidgetList extends UIWidget {
 		}
 
 	}
+	
+	/** Set the actual selected widget */
+	public void setSelected(UIWidget selected) {
+		this.selected = selected;
+	}
 
 	/** Set the selection index */
-	public void setSelected(int index) {
+	public void setSelectedIndex(int index) {
 		this.index = index;
 		selected = registeredWidgets.get(this.index);
 	}
@@ -158,6 +163,10 @@ public class WidgetList extends UIWidget {
 	/** Gets the currently selected widget */
 	public UIWidget getSelected() {
 		return selected;
+	}
+	
+	public Array<UIWidget> getRegisteredWidgets() {
+		return registeredWidgets;
 	}
 
 }

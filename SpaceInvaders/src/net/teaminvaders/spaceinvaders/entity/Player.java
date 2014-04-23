@@ -16,7 +16,7 @@
 
 package net.teaminvaders.spaceinvaders.entity;
 
-import net.teaminvaders.spaceinvaders.engine.SoundEngine;
+import net.teaminvaders.spaceinvaders.engine.SoundFactory;
 import net.teaminvaders.spaceinvaders.level.Level;
 import net.teaminvaders.spaceinvaders.screens.GameScreen;
 
@@ -205,7 +205,7 @@ public class Player extends Entity {
 	@Override
 	public void fire() {
 		if (projectile == null) {
-			SoundEngine.getInstance().playSound("playershoot", 0.50f);
+			SoundFactory.getInstance().playSound("playershoot", 0.50f);
 			projectile = new Projectile(bounds.getX() + width / 2 - 0.05f,
 					bounds.getY() + height, 0.15f, 0.40f,  this);
 			projectile.sprite = new Sprite(new Texture(
@@ -217,7 +217,7 @@ public class Player extends Entity {
 
 	public void removeLife() {
 		projectile = null;
-		SoundEngine.getInstance().playSound("playerkilled", 1f);
+		SoundFactory.getInstance().playSound("playerkilled", 1f);
 		deathTime = TimeUtils.nanoTime();
 		deathAnimFin = false;
 		lifes -= 1;

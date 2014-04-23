@@ -176,6 +176,20 @@ public class UIHandler implements InputProcessor {
 					return true;
 				}
 			}
+//			if(widget.getType() == WidgetType.WIDGET_LIST){
+//				WidgetList list = (WidgetList) widget;
+//				for(UIWidget listWidget : list.getRegisteredWidgets()){
+//					if (mouse.x > listWidget.getBounds().x
+//							&& mouse.x < listWidget.getBounds().x
+//									+ listWidget.getBounds().width
+//							&& mouse.y > listWidget.getBounds().y
+//							&& mouse.y < listWidget.getBounds().y
+//									+ listWidget.getBounds().height) {
+//						list.setSelected(listWidget);
+//						return true;
+//					}
+//				}
+//			}
 		}
 		return false;
 	}
