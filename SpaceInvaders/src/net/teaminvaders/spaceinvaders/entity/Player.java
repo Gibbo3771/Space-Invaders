@@ -39,7 +39,7 @@ public class Player extends Entity {
 	/** The players current score */
 	int score;
 
-	/** The levelCount instance */
+	/** The difficulty instance */
 	Level level;
 
 	/** The players projectile */

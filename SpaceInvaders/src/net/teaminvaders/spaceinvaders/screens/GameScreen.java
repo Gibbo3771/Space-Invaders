@@ -100,7 +100,7 @@ public class GameScreen implements Screen, InputProcessor {
 	/** For drawing debug lines of entity */
 	ShapeRenderer sr = new ShapeRenderer();
 
-	/** The levelCount currently being played */
+	/** The difficulty currently being played */
 	Level level = Level.getInstance();
 
 
@@ -108,7 +108,6 @@ public class GameScreen implements Screen, InputProcessor {
 	public static Player player = new Player(MathUtils.random(9, 38));
 
 	public GameScreen() {
-		
 		
 
 		if (!cam.shakeEnabled())

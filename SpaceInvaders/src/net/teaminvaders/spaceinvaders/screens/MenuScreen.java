@@ -102,6 +102,7 @@ public class MenuScreen implements Screen, InputProcessor {
 
 		menuSprite.setSize(1920, 1080);
 		bg.setSize(1920, 1080);
+		bg.setPosition(0, 0);
 
 		uiHandler.addCamera(cam);
 

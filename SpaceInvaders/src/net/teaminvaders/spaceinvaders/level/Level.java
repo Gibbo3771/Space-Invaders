@@ -36,7 +36,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.gibbo.gameutil.math.NanoSecondConversion;
 
 /**
- * The levelCount currently being played by the user
+ * The difficulty currently being played by the user
  * 
  * @author Stephen Gibson
  */
@@ -51,7 +51,8 @@ public class Level {
 	/** Time when we started to wait */
 	double waitStart;
 
-	public int levelCount = 1;
+	/** Level difficulty */
+	public int difficulty = 1;
 
 	/** The starting row of the Aliens */
 	public int startRow = 18;
@@ -74,7 +75,7 @@ public class Level {
 	public double lastMove = TimeUtils.nanoTime();
 
 	/** The min move freq */
-	public double minMoveFreq = NanoSecondConversion.secondToNanos(0.12);
+	public double minMoveFreq = NanoSecondConversion.secondToNanos(0.18);
 	/** The max move freq */
 	public double maxMoveFreq = NanoSecondConversion.secondToNanos(1);
 	/** How often we move on x */
@@ -107,12 +108,13 @@ public class Level {
 
 	public Level() {
 
+		
 		createNewLevel();
 
 	}
 
 	/**
-	 * Update the levelCount
+	 * Update the difficulty
 	 * 
 	 * @param delta
 	 */
@@ -214,21 +216,26 @@ public class Level {
 			if (CollisionHandler.didCollide(GameScreen.player.getProjectile(),
 					alien)) {
 				GameScreen.player.setProjectile(null);
-				if (alien.equals(furthestLeft))
-					furthestLeft = null;
-				if (alien.equals(furthestRight))
-					furthestRight = null;
+
 				alien.die();
 				alienCount--;
 				GameScreen.player.setScore(GameScreen.player.getScore()
 						+ alien.getPoints());
 				aliensList.removeValue(alien, true);
 
+				if (alien.equals(furthestLeft)) {
+					furthestLeft = null;
+				}
+				
+				if (alien.equals(furthestRight)) {
+					furthestRight = null;
+				}
+				
 				if (aliensList.size > 0)
 					sortAliens();
 
-				if (moveFreq - NanoSecondConversion.secondToNanos(0.018) > minMoveFreq)
-					moveFreq -= NanoSecondConversion.secondToNanos(0.018);
+				if (moveFreq - NanoSecondConversion.secondToNanos(0.014) > minMoveFreq)
+					moveFreq -= NanoSecondConversion.secondToNanos(0.014);
 
 				if (alienCount == 1) {
 					moveFreq = NanoSecondConversion.secondToNanos(0);
@@ -259,7 +266,7 @@ public class Level {
 						canMoveDown = true;
 					}
 					if (alienCount == 1) {
-						alien.setSpeed(0.8f + (0.1f * levelCount));
+						alien.setSpeed(0.8f + (0.1f * difficulty));
 						alien.getSprite().setColor(Color.RED);
 					}
 				}
@@ -279,7 +286,7 @@ public class Level {
 						alien.fire();
 					}
 					if (alienCount == 1) {
-						alien.setSpeed(0.8f + (0.125f * levelCount));
+						alien.setSpeed(0.7f + (0.125f * difficulty));
 						alien.getSprite().setColor(Color.RED);
 					}
 				}
@@ -335,12 +342,12 @@ public class Level {
 		 * Check if pass level 7, if so we want to stop lowering the aliens for
 		 * 4 more levels
 		 */
-		if (levelCount > 6) {
-			if (levelCount >= 11) {
+		if (difficulty > 6) {
+			if (difficulty >= 11) {
 				startRow = 18;
 				endRow = 8;
 				moveFreq = maxMoveFreq;
-				levelCount = 1;
+				difficulty = 1;
 				movingLeft = false;
 				canMoveDown = false;
 				GameScreen.player
@@ -350,9 +357,9 @@ public class Level {
 				 * Just make the level harder by speeding up the starting speed
 				 * of the aliens
 				 */
-				levelCount++;
+				difficulty++;
 				moveFreq = maxMoveFreq
-						- (NanoSecondConversion.secondToNanos(0.05d) * levelCount);
+						- (NanoSecondConversion.secondToNanos(0.05d) * difficulty);
 				movingLeft = false;
 				canMoveDown = false;
 			}
@@ -362,9 +369,9 @@ public class Level {
 			 * Else just make the level harder and lower alien start row, and
 			 * speed them up
 			 */
-			levelCount++;
+			difficulty++;
 			moveFreq = maxMoveFreq
-					- (NanoSecondConversion.secondToNanos(0.05d) * levelCount);
+					- (NanoSecondConversion.secondToNanos(0.05d) * difficulty);
 			startRow--;
 			endRow--;
 			canMoveDown = false;
@@ -413,7 +420,7 @@ public class Level {
 		startRow = 18;
 		endRow = 8;
 		moveFreq = maxMoveFreq;
-		levelCount = 1;
+		difficulty = 1;
 		invaded = false;
 		movingLeft = false;
 		canMoveDown = false;
@@ -487,11 +494,13 @@ public class Level {
 		aliensList.sort();
 
 		/* Check if the furthest left is null, if so we set the new one */
-		if (furthestLeft == null)
+		if (furthestLeft == null) {
 			furthestLeft = aliensList.first();
+		}
 		/* Check if the furthest right is null, if so we set the new one */
-		if (furthestRight == null)
+		if (furthestRight == null) {
 			furthestRight = aliensList.peek();
+		}
 	}
 
 	/**
