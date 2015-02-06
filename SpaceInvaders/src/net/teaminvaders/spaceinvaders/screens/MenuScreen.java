@@ -77,13 +77,13 @@ public class MenuScreen implements Screen, InputProcessor {
 
 				@Override
 				public void execute() {
-
+//					OptionsScreen.previous = instance;
 					((Game) Gdx.app.getApplicationListener())
 							.setScreen(OptionsScreen.instance);
 				}
 			});
 
-	TextButton exit = new TextButton("QUIT", 300, 100, new ButtonCallback() {
+	TextButton exit = new TextButton("EXIT", 300, 100, new ButtonCallback() {
 
 		@Override
 		public void execute() {

@@ -16,17 +16,22 @@
 
 package net.teaminvaders.spaceinvaders.screens;
 
+import java.util.Comparator;
+
 import net.teaminvaders.spaceinvaders.engine.Settings;
 import net.teaminvaders.spaceinvaders.engine.SoundFactory;
 import net.teaminvaders.spaceinvaders.engine.ui.UIHandler;
+import net.teaminvaders.spaceinvaders.engine.ui.widget.UIWidget;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.ButtonCallback;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.TextButton;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.ToggleButton;
+import net.teaminvaders.spaceinvaders.engine.ui.widget.list.SelectableList;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.list.WidgetList;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
@@ -46,7 +51,9 @@ public class OptionsScreen implements Screen {
 
 	UIHandler uiHandler = new UIHandler();
 
-	WidgetList list = new WidgetList(450, 350, 300, 100);
+	WidgetList list = new WidgetList(450, 450, 300, 100);
+
+	SelectableList resolutionList = new SelectableList(450, 450, 300, 100);
 
 	ToggleButton sound = new ToggleButton("SOUND : ON", "SOUND : OFF", 0, 0,
 			300, 100, new ButtonCallback() {
@@ -54,6 +61,26 @@ public class OptionsScreen implements Screen {
 				@Override
 				public void execute() {
 					Settings.soundEnabled = Settings.soundEnabled == 1 ? -1 : 1;
+					if (Settings.soundEnabled == -1) {
+						sound.setEnabled(false);
+					} else {
+						sound.setEnabled(true);
+					}
+				}
+			});
+
+	ToggleButton fullscreen = new ToggleButton("FULLSCREEN : OFF",
+			"FULLSCREEN : ON", 0, 0, 300, 100, new ButtonCallback() {
+
+				@Override
+				public void execute() {
+					if (Settings.fullscreen == 1) {
+						fullscreen.setEnabled(true);
+					} else {
+						fullscreen.setEnabled(false);
+					}
+					Settings.changeResolution(Settings.width, Settings.height,
+							Settings.fullscreen == 1 ? -1 : 1);
 				}
 			});
 
@@ -64,8 +91,10 @@ public class OptionsScreen implements Screen {
 				public void execute() {
 					Settings.musicEnabled = Settings.musicEnabled == 1 ? -1 : 1;
 					if (Settings.musicEnabled == -1) {
+						music.setEnabled(false);
 						SoundFactory.getInstance().getMusic("theme").pause();
 					} else {
+						music.setEnabled(true);
 						SoundFactory.getInstance().playMusic("theme", 0.75f,
 								true);
 					}
@@ -102,6 +131,55 @@ public class OptionsScreen implements Screen {
 
 		uiHandler.addCamera(cam);
 
+		for (int x = 0; x < Settings.displayModes.length; x++) {
+			final DisplayMode mode = Settings.displayModes[x];
+			if (mode.refreshRate != 60)
+				continue;
+//			if(mode.width % 16 != 0 && mode.height % 9 != 0)
+//				continue;
+			TextButton button = new TextButton(mode.width + "x" + mode.height,
+					300, 100, new ButtonCallback() {
+
+						@Override
+						public void execute() {
+							Settings.changeResolution(mode.width, mode.height,
+									Settings.fullscreen);
+						}
+					});
+
+			resolutionList.addWidget(button);
+			if (button.getText().contentEquals(
+					Settings.width + "x" + Settings.height)) {
+				resolutionList.setSelected(button);
+			}
+		}
+
+		resolutionList.getRegisteredWidgets().sort(new Comparator<UIWidget>() {
+
+			@Override
+			public int compare(UIWidget o1, UIWidget o2) {
+				TextButton b1 = (TextButton) o1;
+				TextButton b2 = (TextButton) o2;
+
+				String[] parts1 = b1.getText().split("x");
+				String[] parts2 = b2.getText().split("x");
+
+				int w1 = Integer.parseInt(parts1[0]);
+				int h1 = Integer.parseInt(parts1[1]);
+				
+				int w2 = Integer.parseInt(parts2[0]);
+				int h2 = Integer.parseInt(parts2[1]);
+
+				if (w1 > w2) {
+					return 1;
+				}
+
+				return 0;
+			}
+		});
+
+		list.addWidget(resolutionList);
+		list.addWidget(fullscreen);
 		list.addWidget(sound);
 		list.addWidget(music);
 		list.addWidget(back);
@@ -117,6 +195,12 @@ public class OptionsScreen implements Screen {
 			sound.enabled = false;
 		} else {
 			sound.enabled = true;
+		}
+
+		if (Settings.fullscreen == 1) {
+			fullscreen.setEnabled(false);
+		} else {
+			fullscreen.setEnabled(true);
 		}
 
 	}
@@ -138,7 +222,7 @@ public class OptionsScreen implements Screen {
 
 		if (Settings.applicationType == ApplicationType.Desktop) {
 			batch.draw(alien.getTexture(), list.getSelected().getBounds().x
-					- (alien.getTexture().getWidth()), list.getSelected()
+					- (alien.getTexture().getWidth()) - 60, list.getSelected()
 					.getBounds().y
 					+ (list.getSelected().getBounds().height / 2)
 					- (alien.getTexture().getHeight() / 2), alien.getTexture()

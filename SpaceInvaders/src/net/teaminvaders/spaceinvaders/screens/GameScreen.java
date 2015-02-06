@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Stephen Gibson
+w * Copyright 2014 Stephen Gibson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,13 @@ package net.teaminvaders.spaceinvaders.screens;
 
 import net.teaminvaders.spaceinvaders.engine.Explosion;
 import net.teaminvaders.spaceinvaders.engine.SoundFactory;
+import net.teaminvaders.spaceinvaders.engine.ui.UIHandler;
+import net.teaminvaders.spaceinvaders.engine.ui.widget.button.ButtonCallback;
+import net.teaminvaders.spaceinvaders.engine.ui.widget.button.TextButton;
+import net.teaminvaders.spaceinvaders.engine.ui.widget.list.WidgetList;
 import net.teaminvaders.spaceinvaders.entity.Alien;
 import net.teaminvaders.spaceinvaders.entity.Bunker;
+import net.teaminvaders.spaceinvaders.entity.BunkerSegment;
 import net.teaminvaders.spaceinvaders.entity.Player;
 import net.teaminvaders.spaceinvaders.entity.Projectile;
 import net.teaminvaders.spaceinvaders.level.Level;
@@ -48,6 +53,8 @@ import com.gibbo.gameutil.camera.ActionOrthoCamera;
  */
 public class GameScreen implements Screen, InputProcessor {
 
+	GameScreen instance = this;
+
 	/** The width of the frustrum */
 	public final static int WIDTH = 48;
 	public final static int HEIGHT = 24;
@@ -56,10 +63,53 @@ public class GameScreen implements Screen, InputProcessor {
 	final int UI_WIDTH = 1920;
 	final int UI_HEIGHT = 1080;
 
-	/** The camera */
-	public static ActionOrthoCamera cam = new ActionOrthoCamera();
+	/********************************
+	 ********* UI Shit *******
+	 *******************************/
+
 	/** Camera for UI */
 	ActionOrthoCamera uiCam = new ActionOrthoCamera();
+
+	/** UI for pause menu */
+	UIHandler handler = new UIHandler();
+
+	WidgetList pauseList = new WidgetList(1920 / 2 - (300 / 2),
+			1080 / 2, 300, 300);
+
+	TextButton play = new TextButton("GO!", 300, 100, new ButtonCallback() {
+
+		@Override
+		public void execute() {
+			if (gameStateText.contains("READY"))
+				gameStateText = "PAUSED";
+			pauseList.setSelectedIndex(0);
+			paused = false;
+			play.setText("RESUME");
+		}
+	});
+
+
+	TextButton quit = new TextButton("QUIT", 300, 100, new ButtonCallback() {
+
+		@Override
+		public void execute() {
+			paused = false;
+			gameOver = false;
+			pauseList.setSelectedIndex(0);
+			((Game) Gdx.app.getApplicationListener())
+					.setScreen(MenuScreen.instance);
+		}
+	});
+
+	Sprite alien = new Sprite(new Texture(
+			Gdx.files.internal("data/graphics/10alien.png")));
+
+	/********************************
+	 ********* Graphics Shit *******
+	 *******************************/
+
+	/** The camera */
+	public static ActionOrthoCamera cam = new ActionOrthoCamera();
 	/** Batcher */
 	SpriteBatch batch = new SpriteBatch();
 
@@ -67,7 +117,9 @@ public class GameScreen implements Screen, InputProcessor {
 	BitmapFont font = new BitmapFont(
 			Gdx.files.internal("data/font/SpaceInvaders28.fnt"));
 
+	float alphaChange = 0;
 	float alpha = 1;
+	
 	BitmapFont font2 = new BitmapFont(
 			Gdx.files.internal("data/font/SpaceInvaders28.fnt"));
 
@@ -100,15 +152,17 @@ public class GameScreen implements Screen, InputProcessor {
 	/** For drawing debug lines of entity */
 	ShapeRenderer sr = new ShapeRenderer();
 
+	/********************************
+	 ********* Level Shit *******
+	 *******************************/
+
 	/** The difficulty currently being played */
 	Level level = Level.getInstance();
-
 
 	/** The player */
 	public static Player player = new Player(MathUtils.random(9, 38));
 
 	public GameScreen() {
-		
 
 		if (!cam.shakeEnabled())
 			cam.enableShake(true);
@@ -123,6 +177,12 @@ public class GameScreen implements Screen, InputProcessor {
 		ground.setColor(Color.GREEN);
 		ground.setPosition(9, 1);
 
+		pauseList.addWidget(play);
+		pauseList.addWidget(quit);
+		handler.addWidget(pauseList);
+
+		handler.addCamera(uiCam);
+		Gdx.input.setInputProcessor(handler);
 	}
 
 	@Override
@@ -156,6 +216,9 @@ public class GameScreen implements Screen, InputProcessor {
 						gameOver = true;
 					}
 				}
+
+				Gdx.input.setInputProcessor(this);
+
 			} else {
 				font.setColor(Color.WHITE);
 				font.draw(batch, gameOverReason,
@@ -183,33 +246,100 @@ public class GameScreen implements Screen, InputProcessor {
 				}
 
 			}
+
+			for (Alien alien : level.aliensList) {
+				alien.getSprite().setAlpha(1f);
+			}
+
+			for (Bunker bunker : level.bunkers) {
+				if (bunker == null)
+					continue;
+				for (int x = 0; x < bunker.getSegments().length; x++) {
+					for (int y = 0; y < bunker.getSegments()[0].length; y++) {
+						BunkerSegment segment = bunker.getSegments()[x][y];
+						if (segment == null)
+							continue;
+						for (int z = 0; z < segment.getSprites().length; z++) {
+							if (segment.getSprites()[z] == null)
+								continue;
+							segment.getSprites()[z].setAlpha(1f);
+						}
+					}
+				}
+			}
+			player.getSprite().setAlpha(1);
+
+			ground.setAlpha(1f);
+
+			for(Projectile p : level.projectiles){
+				if(p == null)
+					continue;
+				p.getSprite().setAlpha(1);
+			}
+			
 		} else {
-			if (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)
-					|| Gdx.input.isKeyPressed(Keys.S)) {
-				gameStateText = "PAUSED\n" + "MENU : ESCAPE";
-				paused = false;
+
+			for (Alien alien : level.aliensList) {
+				alien.getSprite().setAlpha(0.15f);
 			}
-			if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
-				gameOver = false;
-				((Game) Gdx.app.getApplicationListener())
-						.setScreen(MenuScreen.instance);
+
+			for (Bunker bunker : level.bunkers) {
+				if (bunker == null)
+					continue;
+				for (int x = 0; x < bunker.getSegments().length; x++) {
+					for (int y = 0; y < bunker.getSegments()[0].length; y++) {
+						BunkerSegment segment = bunker.getSegments()[x][y];
+						if (segment == null)
+							continue;
+						for (int z = 0; z < segment.getSprites().length; z++) {
+							if (segment.getSprites()[z] == null)
+								continue;
+							segment.getSprites()[z].setAlpha(0.15f);
+						}
+					}
+				}
 			}
-			font2.setColor(1, 1, 1, alpha);
+
+			player.getSprite().setAlpha(0.1f);
+
+			ground.setAlpha(0.15f);
+			
+			for(Projectile p : level.projectiles){
+				if(p == null)
+					continue;
+				p.getSprite().setAlpha(0.1f);
+			}
+
+			font2.setColor(0, 1, 0, alpha);
 			font2.draw(
 					batch,
-					gameStateText.substring(0, 6),
+					gameStateText,
 					UI_WIDTH
 							/ 2
 							- (font.getBounds(gameStateText.substring(0, 6)).width / 2),
-					UI_HEIGHT - (font.getBounds("X").height));
-			font2.draw(
-					batch,
-					gameStateText.substring(6),
-					UI_WIDTH
-							/ 2
-							- (font.getBounds(gameStateText.substring(6)).width / 2),
-					0 + (font.getBounds("X").height) * 2.8f);
-			alpha += 1 * delta;
+					UI_HEIGHT / 2 + (font.getBounds("X").height * 4));
+			if(alpha + (1 * delta) > 1){
+				alphaChange = -1;
+				alpha = 1;
+			}else if(alpha + (-1 * delta) < 0.10f){
+				alphaChange = 1;
+			}
+				
+			alpha += alphaChange * delta;
+
+			handler.update();
+			handler.draw(batch);
+
+			batch.draw(alien.getTexture(),
+					pauseList.getSelected().getBounds().x
+							- (alien.getTexture().getWidth() / 2), pauseList
+							.getSelected().getBounds().y
+							+ (pauseList.getSelected().getBounds().height / 2)
+							- (alien.getTexture().getHeight() / 2), alien
+							.getTexture().getWidth() / 2, alien.getTexture()
+							.getHeight(), 0, 0,
+					alien.getTexture().getWidth() / 2, alien.getTexture()
+							.getHeight(), false, false);
 		}
 
 		font.setColor(Color.WHITE);
@@ -222,12 +352,12 @@ public class GameScreen implements Screen, InputProcessor {
 		font.draw(batch, String.valueOf(player.getScore()),
 				25 + font.getBounds("SCORE: ").width + 10,
 				UI_HEIGHT - font.getBounds("X").height);
-		
+
 		batch.setProjectionMatrix(cam.combined);
-		
+
 		ground.draw(batch);
 		player.draw(batch);
-		
+
 		for (Bunker bunker : level.bunkers) {
 			if (bunker == null)
 				continue;
@@ -259,17 +389,18 @@ public class GameScreen implements Screen, InputProcessor {
 
 		sr.setProjectionMatrix(cam.combined);
 		sr.begin(ShapeType.Line);
-//		if (level.special != null)
-//			sr.box(level.special.getBounds().x, level.special.getBounds().y, 0,
-//					level.special.getBounds().width,
-//					level.special.getBounds().height, 0);
-//		sr.box(player.getBounds().getX(), player.getBounds().getY(), 0, player
-//				.getBounds().getWidth(), player.getBounds().getHeight(), 0);
-//
-//		for (Projectile p : level.projectiles) {
-//			sr.box(p.getBounds().x, p.getBounds().y, 0, p.getBounds().width,
-//					p.getBounds().height, 0);
-//		}
+		// if (level.special != null)
+		// sr.box(level.special.getBounds().x, level.special.getBounds().y, 0,
+		// level.special.getBounds().width,
+		// level.special.getBounds().height, 0);
+		// sr.box(player.getBounds().getX(), player.getBounds().getY(), 0,
+		// player
+		// .getBounds().getWidth(), player.getBounds().getHeight(), 0);
+		//
+		// for (Projectile p : level.projectiles) {
+		// sr.box(p.getBounds().x, p.getBounds().y, 0, p.getBounds().width,
+		// p.getBounds().height, 0);
+		// }
 
 		sr.end();
 
@@ -281,13 +412,15 @@ public class GameScreen implements Screen, InputProcessor {
 
 	@Override
 	public void show() {
-		gameStateText = "READY?\n" + "Press S or LCTRL";
+		gameStateText = "READY?";
 		paused = true;
+		Gdx.input.setInputProcessor(handler);
 	}
 
 	@Override
 	public void hide() {
-		player = new Player(MathUtils.random(9, 38));
+		if (player.getLifes() == 0)
+			player = new Player(MathUtils.random(9, 38));
 		level.clearAliens();
 		level.createNewLevel();
 
@@ -313,6 +446,7 @@ public class GameScreen implements Screen, InputProcessor {
 		switch (keycode) {
 		case Keys.P:
 			paused = paused ? false : true;
+			Gdx.input.setInputProcessor(handler);
 			break;
 
 		default:

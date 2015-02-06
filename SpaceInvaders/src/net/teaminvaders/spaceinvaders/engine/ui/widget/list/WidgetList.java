@@ -29,13 +29,13 @@ import com.badlogic.gdx.utils.Array;
 public class WidgetList extends UIWidget {
 
 	/** A list of widgets currently on this list */
-	Array<UIWidget> registeredWidgets = new Array<UIWidget>();
+	protected Array<UIWidget> registeredWidgets = new Array<UIWidget>();
 
 	/** The currently selected widget */
-	UIWidget selected;
+	protected UIWidget selected;
 
 	/** The index of the selected widget */
-	private int index = 0;
+	protected int index = 0;
 
 	/*
 	 * @param x
@@ -111,6 +111,7 @@ public class WidgetList extends UIWidget {
 		registeredWidgets.add(widget);
 
 		selected = registeredWidgets.get(index);
+		
 	}
 
 	/** Change the currently selected widget in this list */
@@ -168,5 +169,6 @@ public class WidgetList extends UIWidget {
 	public Array<UIWidget> getRegisteredWidgets() {
 		return registeredWidgets;
 	}
+	
 
 }

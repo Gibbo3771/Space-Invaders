@@ -54,7 +54,6 @@ public class ToggleButton extends Button {
 		super.update();
 		
 		
-		enabled = enabled == true ? false : true;
 	}
 
 	@Override

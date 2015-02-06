@@ -19,6 +19,7 @@ package net.teaminvaders.spaceinvaders.engine.ui;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.UIWidget;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.UIWidget.WidgetType;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.button.ToggleButton;
+import net.teaminvaders.spaceinvaders.engine.ui.widget.list.SelectableList;
 import net.teaminvaders.spaceinvaders.engine.ui.widget.list.WidgetList;
 
 import com.badlogic.gdx.Gdx;
@@ -112,6 +113,29 @@ public class UIHandler implements InputProcessor {
 
 			if (widget.getType() == WidgetType.WIDGET_LIST) {
 				WidgetList widgetList = (WidgetList) widget;
+				for (int x = 0; x < widgetList.getRegisteredWidgets().size - 1; x++) {
+					widget = widgetList.getRegisteredWidgets().get(x);
+					if (widgetList.getSelected().getType() == WidgetType.SELECTABLE_LIST) {
+						SelectableList selectableList = (SelectableList) widgetList.getSelected();
+						switch (keycode) {
+						case Keys.A:
+						case Keys.LEFT:
+							selectableList.changeSelection(-1);
+							break;
+						case Keys.D:
+						case Keys.RIGHT:
+							selectableList.changeSelection(1);
+							break;
+						case Keys.E:
+						case Keys.ENTER:
+							selectableList.update();
+							break;
+						default:
+							break;
+						}
+
+					}
+				}
 				switch (keycode) {
 				case Keys.W:
 				case Keys.UP:
@@ -129,13 +153,13 @@ public class UIHandler implements InputProcessor {
 					break;
 				}
 
-			}
-			if(widget.getType() == WidgetType.BUTTON ){
+			} else if (widget.getType() == WidgetType.BUTTON) {
 				ToggleButton toggleButton = (ToggleButton) widget;
 				switch (keycode) {
 				case Keys.E:
 					toggleButton.update();
-					toggleButton.enabled = toggleButton.enabled == true ? false : true;
+					toggleButton.enabled = toggleButton.enabled == true ? false
+							: true;
 					break;
 				default:
 					break;
@@ -176,20 +200,20 @@ public class UIHandler implements InputProcessor {
 					return true;
 				}
 			}
-//			if(widget.getType() == WidgetType.WIDGET_LIST){
-//				WidgetList list = (WidgetList) widget;
-//				for(UIWidget listWidget : list.getRegisteredWidgets()){
-//					if (mouse.x > listWidget.getBounds().x
-//							&& mouse.x < listWidget.getBounds().x
-//									+ listWidget.getBounds().width
-//							&& mouse.y > listWidget.getBounds().y
-//							&& mouse.y < listWidget.getBounds().y
-//									+ listWidget.getBounds().height) {
-//						list.setSelected(listWidget);
-//						return true;
-//					}
-//				}
-//			}
+			// if(widget.getType() == WidgetType.WIDGET_LIST){
+			// WidgetList list = (WidgetList) widget;
+			// for(UIWidget listWidget : list.getRegisteredWidgets()){
+			// if (mouse.x > listWidget.getBounds().x
+			// && mouse.x < listWidget.getBounds().x
+			// + listWidget.getBounds().width
+			// && mouse.y > listWidget.getBounds().y
+			// && mouse.y < listWidget.getBounds().y
+			// + listWidget.getBounds().height) {
+			// list.setSelected(listWidget);
+			// return true;
+			// }
+			// }
+			// }
 		}
 		return false;
 	}

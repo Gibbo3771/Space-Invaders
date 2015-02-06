@@ -18,6 +18,7 @@ package net.teaminvaders.spaceinvaders.engine;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.files.FileHandle;
 
 /**
@@ -37,11 +38,27 @@ public class Settings {
 
 	/** The options file */
 	static FileHandle file = Gdx.files.external("SpaceInvaders/options.ini");;
+	
+	/** Available display modes */
+	public static DisplayMode[] displayModes = Gdx.graphics.getDisplayModes();
+	
+	public static int width = 768;
+	
+	public static int height = 432;
+	
+	public static int fullscreen = 0;
 
 	public static void save() {
 		file.writeString(String.valueOf(musicEnabled), false);
 		file.writeString(",", true);
 		file.writeString(String.valueOf(soundEnabled), true);
+		file.writeString(",", true);
+		file.writeString(String.valueOf(width), true);
+		file.writeString(",", true);
+		file.writeString(String.valueOf(height), true);
+		file.writeString(",", true);
+		file.writeString(String.valueOf(fullscreen), true);
+		
 
 	}
 
@@ -51,9 +68,27 @@ public class Settings {
 			String[] split = string.split(",");
 			musicEnabled = Integer.parseInt(split[0]);
 			soundEnabled = Integer.parseInt(split[1]);
+			changeResolution(Integer.parseInt(split[2]), Integer.parseInt(split[3]), Integer.parseInt(split[4]));
+			
+		}else{
+			DisplayMode[] modes = Gdx.graphics.getDisplayModes();
+			for(int x = 0; x < modes.length; x ++){
+				if(modes[x].width < 1000 && modes[x].width > 500){
+					changeResolution(modes[x].width, modes[x].height, 0);
+					
+				}
+			}
 		}
 		
-
+		
+	}
+	
+	
+	public static void changeResolution(int width, int height, int fullscreen){
+		Settings.width = width;
+		Settings.height = height;
+		Settings.fullscreen = fullscreen;
+		Gdx.graphics.setDisplayMode(width, height, fullscreen == 1 ? true : false);
 	}
 
 }

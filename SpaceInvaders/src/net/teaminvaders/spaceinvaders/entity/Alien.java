@@ -52,7 +52,6 @@ public class Alien extends Entity implements Comparable<Alien> {
 	public static Texture special = new Texture(
 			Gdx.files.internal("data/graphics/alienspecial.png"));
 
-
 	/** The aliens position before moving down */
 	public float oldY;
 
@@ -87,7 +86,6 @@ public class Alien extends Entity implements Comparable<Alien> {
 		bounds.setOwner(this);
 
 		oldY = y;
-
 
 		switch (type) {
 		case TIER1:

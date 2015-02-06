@@ -31,7 +31,7 @@ public class TextButton extends Button {
 			Gdx.files.internal("data/font/SpaceInvaders28.fnt"));
 
 	/** The text displayed for the button */
-	String text;
+	private String text;
 
 	/**
 	 * Create a new text button
@@ -74,6 +74,15 @@ public class TextButton extends Button {
 		font.draw(batch, text, x + (width / 2)
 				- (font.getBounds(text).width / 2),
 				y + (height / 2) + (font.getBounds("X").height) / 2);
+	}
+	
+	public void setText(String text) {
+		this.text = null;
+		this.text = text;
+	}
+	
+	public String getText() {
+		return text;
 	}
 
 }

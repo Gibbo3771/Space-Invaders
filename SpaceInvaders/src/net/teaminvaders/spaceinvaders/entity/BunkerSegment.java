@@ -47,9 +47,12 @@ public class BunkerSegment extends Entity {
 		if (health >= 1) {
 			Sprite sprite = sprites[health - 1];
 			if (sprite != null) {
-				sprites[health - 1].setColor(Color.GREEN);
-				sprites[health - 1].setPosition(bounds.x, bounds.y);
-				sprites[health - 1].draw(batch);
+				float alpha = sprite.getColor().a;
+				sprite.setColor(Color.GREEN);
+				sprite.setColor(sprite.getColor().r, sprite.getColor().g,
+						sprite.getColor().b, alpha);
+				sprite.setPosition(bounds.x, bounds.y);
+				sprite.draw(batch);
 			}
 		}
 	}

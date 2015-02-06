@@ -28,7 +28,7 @@ public abstract class UIWidget {
 
 	/** An enum holding all possible types of a UI Widger */
 	public enum WidgetType {
-		BUTTON, TOGGLE_BUTTON, WIDGET_LIST;
+		BUTTON, TOGGLE_BUTTON, WIDGET_LIST, SELECTABLE_LIST;
 	}
 
 	/** The type of widget */
